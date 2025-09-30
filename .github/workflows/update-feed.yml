@@ -1,0 +1,36 @@
+name: Update Podcast Feed
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */12 * * *" # every 12 hours
+  push:
+    paths:
+      - ".github/workflows/update-feed.yml"
+      - "scripts/**"
+      - "package.json"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - name: Fetch RSS → episodes.json (+ cache images)
+        run: npm run build-feed
+        env:
+          RSS_URL: "https://anchor.fm/s/1091ae5c8/podcast/rss"
+
+      - name: Commit data if changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update feed + images"
+          file_pattern: |
+            episodes.json
+            images/**
+

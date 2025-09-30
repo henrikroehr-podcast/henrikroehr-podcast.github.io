@@ -1,23 +1,72 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="utf-8" />
-  <title>My Podcast</title>
+  <title>Bewusstseinswelten-Podcast</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="preload" as="image" href="logo.png">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- Header: logo (left) + big title aligned with content column -->
   <header class="site-header">
-    <img src="logo.png" alt="Podcast Logo" class="logo" />
+    <div class="header-inner">
+      <img src="logo.png" alt="Podcast Logo" class="logo" />
+      <h1 id="podcast-title" class="site-title">Bewusstseinswelten-Podcast</h1>
+    </div>
   </header>
 
   <main class="container">
-    <section id="episodes" class="grid" aria-live="polite">
-      <!-- Tiles get injected here by app.js -->
+    <!-- Description BELOW the header row -->
+    <section class="intro">
+      <p id="podcast-description" class="description"></p>
+    </section>
+
+    <!-- Listen chips -->
+    <section class="listen">
+      <h2 class="listen-title">Anhören über</h2>
+      <nav class="listen-links" aria-label="Plattformen">
+        <a class="listen-link" href="https://open.spotify.com/show/3YfazKQxe0ExapdRTAtaFZ" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5C6.21 1.5 1.5 6.21 1.5 12S6.21 22.5 12 22.5 22.5 17.79 22.5 12 17.79 1.5 12 1.5Zm4.99 14.59a.8.8 0 0 1-1.1.27c-3.02-1.84-6.82-2.25-11.28-1.22a.8.8 0 1 1-.36-1.55c4.86-1.14 9.06-.67 12.42 1.33.37.22.49.7.27 1.17Zm1.54-3.45a1 1 0 0 1-1.37.33c-3.46-2.12-8.73-2.74-12.83-1.48a1 1 0 1 1-.58-1.92c4.6-1.39 10.39-.69 14.31 1.67.48.29.64.93.47 1.4Zm.13-3.62c-4.01-2.37-10.63-2.59-14.45-1.39a1.2 1.2 0 0 1-.71-2.29c4.4-1.37 11.78-1.09 16.45 1.64a1.2 1.2 0 0 1-1.29 2.04Z"/></svg>
+          <span>Spotify</span>
+        </a>
+        <a class="listen-link" href="https://podcasts.apple.com/us/podcast/bewusstseinswelten-podcast/id1838633257" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.75a10.25 10.25 0 1 0 0 20.5 10.25 10.25 0 0 0 0-20.5Zm0 2a8.25 8.25 0 1 1 0 16.5 8.25 8.25 0 0 1 0-16.5Zm0 2.5a3.25 3.25 0 0 0-1 6.33v4.42a1 1 0 1 0 2 0V12.58A3.25 3.25 0 0 0 12 6.25Zm0 2a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z"/></svg>
+          <span>Apple Podcasts</span>
+        </a>
+        <a class="listen-link" href="https://anchor.fm/s/1091ae5c8/podcast/rss" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 17.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM2.25 3a1 1 0 0 0 0 2C12.2 5 19 11.8 19 21.75a1 1 0 1 0 2 0C21 10.69 13.31 3 2.25 3Zm0 5.5a1 1 0 0 0 0 2c7.18 0 13 5.82 13 13a1 1 0 1 0 2 0c0-8.29-6.71-15-15-15Z"/></svg>
+          <span>RSS</span>
+        </a>
+        <a class="listen-link" href="https://www.youtube.com/@Bewusstseinswelten-Podcast" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 7.2s-.2-1.6-.8-2.3a3.1 3.1 0 0 0-2.2-.8C17.6 4 12 4 12 4s-5.6 0-8 .1c-.9 0-1.7.3-2.2.8C1.2 5.6 1 7.2 1 7.2S.9 9.1.9 11v2c0 1.9.1 3.8.1 3.8s.2 1.6.8 2.3c.5.5 1.3.8 2.2.8C6.4 20 12 20 12 20s5.6 0 8-.1c.9 0 1.7-.3 2.2-.8.6-.7.8-2.3.8-2.3S23.1 12.9 23.1 11V9c0-1.9-.1-3.8-.1-3.8ZM9.8 15.2V7.9l6.2 3.7-6.2 3.6Z"/></svg>
+          <span>YouTube</span>
+        </a>
+      </nav>
+    </section>
+
+    <!-- Episodes grid -->
+    <section id="episodes" class="grid" aria-live="polite"></section>
+
+    <!-- Host section under episodes -->
+    <section class="host">
+      <div class="host-text">
+        <h2>Host Henrik Röhr</h2>
+        <p>
+          Henrik Röhr ist Wissenschaftler und Dozent an den Universitäten Freiburg und Groningen. Er verknüpft seinen 
+          akademischen Hintergrund in Physik, Philosophie, Evolutionspsychologie und Neurowissenschaften mit 
+          Erfahrungen aus langen Meditationsretreats und der Erkundung veränderter Bewusstseinszustände. 
+          Durch Gespräche mit Menschen, die Bewusstsein aus unterschiedlichen Richtungen erforschen, möchte er 
+          einen einzigartigen und faszinierenden Zugang hierzu kreieren.
+        </p>
+      </div>
+      <div class="host-photo">
+        <img src="henrik_prisma.jpg" alt="Henrik Röhr" />
+      </div>
     </section>
   </main>
 
+  <!-- Card template -->
   <template id="episode-card-tpl">
     <article class="card">
       <div class="thumb-wrap">
@@ -35,3 +84,4 @@
   <script src="app.js" defer></script>
 </body>
 </html>
+

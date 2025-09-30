@@ -6,7 +6,7 @@
     "build-feed": "node scripts/fetch-feed.mjs"
   },
   "dependencies": {
-    "fast-xml-parser": "^4.5.0",
+    "fast-xml-parser": "^4.5.3",
     "node-fetch": "^3.3.2",
     "node-html-parser": "^6.1.13"
   }
