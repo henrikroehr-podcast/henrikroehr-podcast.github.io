@@ -2,6 +2,7 @@ const EPISODES_JSON = 'episodes.json';
 const FALLBACK_RSS = 'https://anchor.fm/s/1091ae5c8/podcast/rss';
 
 let flyout;
+let FEED_GEN_AT = ''; 
 
 (async function init() {
   // Shared flyout
@@ -22,6 +23,8 @@ let flyout;
   } catch {
     data = await fetchRssInBrowser(FALLBACK_RSS).catch(() => ({ items: [], channel: {} }));
   }
+
+  FEED_GEN_AT = data?.generatedAt || '';
 
   const titleEl = document.getElementById('podcast-title');
   const descEl = document.getElementById('podcast-description');
