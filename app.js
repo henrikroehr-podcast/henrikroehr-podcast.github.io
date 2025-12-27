@@ -16,12 +16,22 @@ let FEED_GEN_AT = '';
   document.body.appendChild(flyout);
 
   let data;
+
+  // 🔁 NEW ORDER:
+  // 1) Try LIVE RSS (this is what Spotify / Apple use)
+  // 2) If that fails (CORS / network), fall back to episodes.json
   try {
-    const res = await fetch(`${EPISODES_JSON}?t=${Date.now()}`, { cache: 'no-store' });
-    if (!res.ok) throw new Error('no episodes.json yet');
-    data = await res.json();
-  } catch {
-    data = await fetchRssInBrowser(FALLBACK_RSS).catch(() => ({ items: [], channel: {} }));
+    data = await fetchRssInBrowser(FALLBACK_RSS);
+  } catch (e) {
+    console.warn('Failed to fetch RSS in browser, falling back to episodes.json', e);
+    try {
+      const res = await fetch(`${EPISODES_JSON}?t=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error('no episodes.json yet');
+      data = await res.json();
+    } catch (e2) {
+      console.error('Failed to fetch both RSS and episodes.json', e2);
+      data = { items: [], channel: {} };
+    }
   }
 
   FEED_GEN_AT = data?.generatedAt || '';
@@ -36,7 +46,7 @@ let FEED_GEN_AT = '';
 
 // --- Image Fallback Helper ---
 function setupEpisodeImage(img, episode) {
-  // Prefer real episode RSS image, then show-level RSS image, then local fallback
+  // Prefer per-episode image from RSS, then show-level image, then local logo
   const candidates = [
     episode.image,
     episode.podcastImage,
@@ -80,7 +90,7 @@ function renderEpisodes(items) {
     const btn = node.querySelector('.play-btn');
     const audio = node.querySelector('.audio');
 
-    // FIXED: robust image fallback logic using RSS images
+    // Use robust image logic based on RSS fields
     setupEpisodeImage(img, item);
 
     title.textContent = item.title || 'Untitled episode';
