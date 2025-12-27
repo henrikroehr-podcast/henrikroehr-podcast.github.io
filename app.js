@@ -34,6 +34,33 @@ let FEED_GEN_AT = '';
   renderEpisodes(data?.items ?? []);
 })();
 
+// --- Image Fallback Helper ---
+function setupEpisodeImage(img, episode) {
+  // Prefer real episode RSS image, then show-level RSS image, then local fallback
+  const candidates = [
+    episode.image,
+    episode.podcastImage,
+    'logo.png'
+  ].filter(Boolean);
+
+  let idx = 0;
+
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  img.alt = episode.title || 'Episode';
+
+  function tryNext() {
+    if (idx >= candidates.length) {
+      img.onerror = null; // stop looping
+      return;
+    }
+    img.src = candidates[idx++];
+  }
+
+  img.onerror = tryNext;
+  tryNext();
+}
+
 function renderEpisodes(items) {
   const list = document.getElementById('episodes');
   const tpl = document.getElementById('episode-card-tpl');
@@ -53,9 +80,9 @@ function renderEpisodes(items) {
     const btn = node.querySelector('.play-btn');
     const audio = node.querySelector('.audio');
 
-    const pic = item.imageLocal || item.image || item.podcastImage || 'logo.png';
-    img.src = pic;
-    img.alt = item.title || `Episode ${index + 1}`;
+    // FIXED: robust image fallback logic using RSS images
+    setupEpisodeImage(img, item);
+
     title.textContent = item.title || 'Untitled episode';
     date.textContent = formatDate(item.pubDate);
 
@@ -241,4 +268,3 @@ async function fetchRssInBrowser(url) {
   items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
   return { channel: { title: channelTitle, description: channelDesc }, items };
 }
-
