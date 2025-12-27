@@ -2,8 +2,9 @@ const EPISODES_JSON = 'episodes.json';
 const FALLBACK_RSS = 'https://anchor.fm/s/1091ae5c8/podcast/rss';
 
 let flyout;
-let FEED_GEN_AT = ''; 
+let FEED_GEN_AT = '';
 
+// -------------------- INIT --------------------
 (async function init() {
   // Shared flyout
   flyout = document.createElement('div');
@@ -16,22 +17,12 @@ let FEED_GEN_AT = '';
   document.body.appendChild(flyout);
 
   let data;
-
-  // 🔁 NEW ORDER:
-  // 1) Try LIVE RSS (this is what Spotify / Apple use)
-  // 2) If that fails (CORS / network), fall back to episodes.json
   try {
-    data = await fetchRssInBrowser(FALLBACK_RSS);
-  } catch (e) {
-    console.warn('Failed to fetch RSS in browser, falling back to episodes.json', e);
-    try {
-      const res = await fetch(`${EPISODES_JSON}?t=${Date.now()}`, { cache: 'no-store' });
-      if (!res.ok) throw new Error('no episodes.json yet');
-      data = await res.json();
-    } catch (e2) {
-      console.error('Failed to fetch both RSS and episodes.json', e2);
-      data = { items: [], channel: {} };
-    }
+    const res = await fetch(`${EPISODES_JSON}?t=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('no episodes.json yet');
+    data = await res.json();
+  } catch {
+    data = await fetchRssInBrowser(FALLBACK_RSS).catch(() => ({ items: [], channel: {} }));
   }
 
   FEED_GEN_AT = data?.generatedAt || '';
@@ -41,36 +32,38 @@ let FEED_GEN_AT = '';
   if (data?.channel?.title) titleEl.textContent = data.channel.title;
   if (data?.channel?.description) descEl.innerHTML = sanitizeToInlineHtml(data.channel.description);
 
+  // DEBUG: see what data the frontend actually has
+  console.log('EPISODES DATA', data.items);
+
   renderEpisodes(data?.items ?? []);
 })();
 
-// --- Image Fallback Helper ---
-function setupEpisodeImage(img, episode) {
-  // Prefer per-episode image from RSS, then show-level image, then local logo
-  const candidates = [
-    episode.image,
-    episode.podcastImage,
-    'logo.png'
-  ].filter(Boolean);
+// -------------------- IMAGE HANDLING --------------------
+function setupEpisodeImage(img, episode, index) {
+  const url = episode.image && episode.image.trim();
 
-  let idx = 0;
+  // Optional: log to check which episodes have images
+  console.log(`Episode ${index + 1} image:`, url);
+
+  if (!url) {
+    // No episode image -> hide the <img>, do NOT use show cover
+    img.style.display = 'none';
+    return;
+  }
 
   img.loading = 'lazy';
   img.decoding = 'async';
   img.alt = episode.title || 'Episode';
+  img.src = url;
 
-  function tryNext() {
-    if (idx >= candidates.length) {
-      img.onerror = null; // stop looping
-      return;
-    }
-    img.src = candidates[idx++];
-  }
-
-  img.onerror = tryNext;
-  tryNext();
+  img.onerror = () => {
+    // If the URL is broken, don't show a broken icon
+    console.warn('Episode image failed to load:', url);
+    img.style.display = 'none';
+  };
 }
 
+// -------------------- RENDER EPISODES --------------------
 function renderEpisodes(items) {
   const list = document.getElementById('episodes');
   const tpl = document.getElementById('episode-card-tpl');
@@ -90,8 +83,8 @@ function renderEpisodes(items) {
     const btn = node.querySelector('.play-btn');
     const audio = node.querySelector('.audio');
 
-    // Use robust image logic based on RSS fields
-    setupEpisodeImage(img, item);
+    // ONLY use the per-episode image
+    setupEpisodeImage(img, item, index);
 
     title.textContent = item.title || 'Untitled episode';
     date.textContent = formatDate(item.pubDate);
@@ -123,7 +116,7 @@ function renderEpisodes(items) {
   });
 }
 
-// --- Flyout beside card ---
+// -------------------- Flyout beside card --------------------
 let hideTimer = null;
 function showFlyoutBeside(cardEl, item) {
   clearTimeout(hideTimer);
@@ -178,7 +171,7 @@ function hideFlyoutSoon() {
   hideTimer = setTimeout(() => flyout.classList.remove('visible'), 120);
 }
 
-// --- Utilities & fallback ---
+// -------------------- Utilities & fallback --------------------
 function formatDate(str) {
   if (!str) return '';
   const d = new Date(str);
@@ -242,6 +235,7 @@ async function fetchRssInBrowser(url) {
     const enclosure = it.querySelector('enclosure');
     const audioUrl = enclosure?.getAttribute('url') || '';
 
+    // Try to be robust with where the episode image might live
     const imgCandidate =
       it.querySelector('itunes\\:image')?.getAttribute('href') ||
       it.querySelector('media\\:content')?.getAttribute('url') ||
@@ -257,8 +251,7 @@ async function fetchRssInBrowser(url) {
           return temp.querySelector('img')?.getAttribute('src') || '';
         } catch { return ''; }
       })() ||
-      channelImage ||
-      '';
+      ''; // <- IMPORTANT: no fallback to channelImage here
 
     const notesHtml =
       it.querySelector('content\\:encoded')?.textContent ||
@@ -270,11 +263,11 @@ async function fetchRssInBrowser(url) {
       pubDate: it.querySelector('pubDate')?.textContent || '',
       audioUrl,
       image: imgCandidate,
-      podcastImage: channelImage,
+      podcastImage: channelImage, // kept if you ever want it, but not used for covers now
       notesHtml
     };
   });
 
   items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-  return { channel: { title: channelTitle, description: channelDesc }, items };
+  return { channel: { title: channelTitle, description: channelDesc, image: channelImage }, items };
 }
