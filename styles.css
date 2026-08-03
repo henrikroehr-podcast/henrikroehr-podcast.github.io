@@ -49,6 +49,38 @@ html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); f
   letter-spacing: .2px;
   /* Title naturally starts at 16px from container edge, aligning with body text */
 }
+.impressum-link {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  color: var(--muted);
+  font-size: 13px;
+  text-decoration: none;
+}
+.impressum-link:hover { color: var(--text); text-decoration: underline; }
+
+/* ===== Mini footer — small reference to legal pages ===== */
+.mini-footer {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  font-size: 12px;
+  color: var(--muted);
+}
+.mini-footer a { color: var(--muted); text-decoration: none; }
+.mini-footer a:hover { color: var(--text); text-decoration: underline; }
+.mini-footer-sep { margin: 0 8px; }
+
+/* ===== Legal pages (Datenschutzerklärung, etc.) ===== */
+.legal-page { padding-top: 32px; color: var(--muted); }
+.legal-page .back-link { display: inline-block; margin-bottom: 24px; color: var(--muted); text-decoration: none; font-size: 14px; }
+.legal-page .back-link:hover { color: var(--text); text-decoration: underline; }
+.legal-page h1 { color: var(--text); font-size: 32px; margin: 0 0 24px; }
+.legal-page h2 { color: var(--text); font-size: 20px; margin: 32px 0 12px; }
+.legal-page p { line-height: 1.7; margin: 0 0 14px; }
+.legal-page ul { margin: 0 0 14px; padding-left: 20px; line-height: 1.7; }
+.legal-page a { color: var(--accent); text-decoration: underline; }
 
 /* ===== Intro / Description ===== */
 .intro { margin: 12px 16px 16px; }      /* 16px matches container padding for visual alignment */
@@ -65,6 +97,12 @@ html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); f
 }
 .listen-link:hover { transform: translateY(-1px); background: #1f2937; border-color: rgba(255,255,255,.16); }
 .listen-link svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* ===== Follow banner — social chips + newsletter side by side ===== */
+.follow { margin: 14px 16px 48px; }
+.follow .follow-title { margin: 0 0 10px; font-size: 16px; color: var(--text); }
+.follow-row { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.follow-links { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
 /* ===== Tiles grid ===== */
 .grid {
